@@ -1,3 +1,22 @@
+# Pycharm Files
+.idea/**
+
+# history/files outside Docker
+.ipython/**
+.jupyter/**
+.bash_history
+.local/**
+
+# checkpoints
+/save/**
+
+# mnist dataset
+/data/**
+
+# jupyter notebook sandbox
+sandbox*.ipynb
+
+#### ORIGINAL ####
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
