@@ -1,7 +1,12 @@
+import os
 import torch
 
+import base
+
+# ADAM
 MODEL_LEARNING_RATE = 1e-2
-ADVER_LEARNING_RATE = 1e-1
+ADVER_LEARNING_RATE = 1e-1 # -1
+NORMALIZATION_PARAM = 1e-1 # -1
 TRAINING_PHASE_NAME = 'train'
 VALIDATION_PHASE_NAME = 'valid'
 PHASE_LOG_PREFIX = {
@@ -22,6 +27,10 @@ class Experiment:
             self.device = device
 
         self.model.to(self.device)
+        self.trained = False
+
+        os.makedirs(self.model.save_dir(), exist_ok=True)
+        self.save_path = os.path.join(self.model.save_dir(), base.CHECKPOINT_PREFIX + base.EXT_CKPT)
 
     def train_model(self, train_loader, num_epochs, valid_loader=None, validate_every=1):
         for parameter in self.model.parameters():
@@ -44,7 +53,16 @@ class Experiment:
                     loss=valid_loss_mean,
                     acc=valid_acc_mean)
 
+        self.trained = True
+        torch.save({
+            'model_state_dict': self.model.state_dict(),
+        }, self.save_path)
+
     def train_adversarial(self, x_shape: tuple, targets, num_epochs, info_every=1):
+        if self.trained == False:
+            checkpoint = torch.load(self.save_path)
+            self.model.load_state_dict(checkpoint['model_state_dict'])
+
         # noinspection PyArgumentList
         x = torch.nn.Parameter(
             torch.randn(targets.shape[:1] + x_shape,
@@ -85,7 +103,8 @@ class Experiment:
             data, targets = data.to(self.device), targets.to(self.device)
             with torch.set_grad_enabled(is_training):
                 logits = self.model(data)
-                loss = self.loss_fn(logits, targets)
+                # loss = self.loss_fn(logits, targets)
+                loss = self.loss_fn(logits, targets) + NORMALIZATION_PARAM * torch.pow(data,2).sum()
 
             if is_training:
                 optimizer.zero_grad()

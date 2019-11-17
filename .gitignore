@@ -2,10 +2,14 @@
 .idea/**
 
 # history/files outside Docker
+.config/**
 .ipython/**
 .jupyter/**
 .bash_history
 .local/**
+
+# checkpoints
+/images/**
 
 # checkpoints
 /save/**

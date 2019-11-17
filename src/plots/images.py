@@ -1,9 +1,21 @@
 import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
+import matplotlib.pyplot as plt
+
+def plot_images_matplotlib(images, labels, rows=3, cols=4):
+    assert len(images) == len(labels)
+    assert rows * cols >= len(images)
+    fig, ax = plt.subplots(figsize=(16, 6), nrows=rows, ncols=cols)
+
+    for idx, axi in enumerate(ax.flat):
+        axi.imshow(images[idx], cmap='gray_r')
+        axi.set_title('Digit Label: {}'.format(labels[idx]))
+        axi.axis('off')
+    return fig
 
 
-def plot_images(images, labels, rows=3, cols=4):
+def plot_images_plotly(images, labels, rows=3, cols=4):
     assert len(images) == len(labels)
     assert rows * cols >= len(images)
 
@@ -38,4 +50,4 @@ def plot_images(images, labels, rows=3, cols=4):
         height=700,
         width=800,
     )
-    fig.show()
+    return fig
